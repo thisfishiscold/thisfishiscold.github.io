@@ -1,11 +1,243 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <title>Min hemsida</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThaiLearn</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0fff4;
+      color: #1f2937;
+    }
+
+    header {
+      background: #58cc02;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .thai {
+      font-size: 48px;
+      margin: 20px 0;
+    }
+
+    .question {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 14px;
+      background: #e5e7eb;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #d1d5db;
+    }
+
+    .correct {
+      background: #58cc02 !important;
+      color: white;
+    }
+
+    .wrong {
+      background: #ff4b4b !important;
+      color: white;
+    }
+
+    .next {
+      background: #1cb0f6;
+      color: white;
+      font-weight: bold;
+    }
+
+    .score {
+      margin-bottom: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .feedback {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Hej!</h1>
-  <p>Min första hemsida 🚀</p>
+  <header>ThaiLearn 🇹🇭</header>
+
+  <div class="container">
+    <div class="score">
+      Poäng: <span id="score">0</span> ⭐ |
+      Fråga: <span id="current">1</span>/<span id="total"></span>
+    </div>
+
+    <div class="card">
+      <div class="question" id="question"></div>
+      <div class="thai" id="thaiWord"></div>
+      <div id="answers"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next" onclick="nextQuestion()">Nästa</button>
+    </div>
+
+    <footer>
+      Träna thailändska varje dag — små steg ger stora resultat.
+    </footer>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        thai: "สวัสดี",
+        question: "Vad betyder detta?",
+        answers: ["Hej", "Tack", "Vatten", "Mat"],
+        correct: "Hej"
+      },
+      {
+        thai: "ขอบคุณ",
+        question: "Vad betyder detta?",
+        answers: ["Förlåt", "Tack", "Ja", "Nej"],
+        correct: "Tack"
+      },
+      {
+        thai: "น้ำ",
+        question: "Vad betyder detta?",
+        answers: ["Ris", "Vatten", "Kaffe", "Mjölk"],
+        correct: "Vatten"
+      },
+      {
+        thai: "อาหาร",
+        question: "Vad betyder detta?",
+        answers: ["Mat", "Hus", "Bil", "Skola"],
+        correct: "Mat"
+      },
+      {
+        thai: "ใช่",
+        question: "Vad betyder detta?",
+        answers: ["Nej", "Ja", "Kanske", "Hej"],
+        correct: "Ja"
+      },
+      {
+        thai: "ไม่",
+        question: "Vad betyder detta?",
+        answers: ["Ja", "Nej/inte", "Tack", "Bra"],
+        correct: "Nej/inte"
+      },
+      {
+        thai: "รัก",
+        question: "Vad betyder detta?",
+        answers: ["Äta", "Sova", "Älska", "Springa"],
+        correct: "Älska"
+      },
+      {
+        thai: "บ้าน",
+        question: "Vad betyder detta?",
+        answers: ["Hus", "Hund", "Katt", "Väg"],
+        correct: "Hus"
+      }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    document.getElementById("total").textContent = questions.length;
+
+    function loadQuestion() {
+      answered = false;
+      const q = questions[currentIndex];
+
+      document.getElementById("question").textContent = q.question;
+      document.getElementById("thaiWord").textContent = q.thai;
+      document.getElementById("current").textContent = currentIndex + 1;
+      document.getElementById("feedback").textContent = "";
+
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = "";
+
+      q.answers.forEach(answer => {
+        const btn = document.createElement("button");
+        btn.textContent = answer;
+        btn.onclick = () => checkAnswer(btn, answer);
+        answersDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(button, answer) {
+      if (answered) return;
+      answered = true;
+
+      const correctAnswer = questions[currentIndex].correct;
+      const feedback = document.getElementById("feedback");
+
+      if (answer === correctAnswer) {
+        button.classList.add("correct");
+        score++;
+        document.getElementById("score").textContent = score;
+        feedback.textContent = "Rätt! 🎉";
+        feedback.style.color = "#58cc02";
+      } else {
+        button.classList.add("wrong");
+        feedback.textContent = "Fel. Rätt svar är: " + correctAnswer;
+        feedback.style.color = "#ff4b4b";
+      }
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+
+      if (currentIndex >= questions.length) {
+        document.querySelector(".card").innerHTML = `
+          <h2>Klar! 🎉</h2>
+          <p>Du fick ${score} av ${questions.length} rätt.</p>
+          <button class="next" onclick="restart()">Börja om</button>
+        `;
+      } else {
+        loadQuestion();
+      }
+    }
+
+    function restart() {
+      currentIndex = 0;
+      score = 0;
+      document.location.reload();
+    }
+
+    loadQuestion();
+  </script>
 </body>
 </html>
