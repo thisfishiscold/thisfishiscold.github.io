@@ -1,243 +1,204 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ThaiLearn</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f0fff4;
-      color: #1f2937;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thai Trainer (Latin)</title>
 
-    header {
-      background: #58cc02;
-      color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-    }
+<style>
+body { font-family: Arial; margin: 0; background: #f0fdf4; }
+header { background: #58cc02; color: white; text-align: center; padding: 20px; font-size: 26px; }
+.container { max-width: 600px; margin: auto; padding: 20px; }
 
-    .container {
-      max-width: 600px;
-      margin: 30px auto;
-      padding: 20px;
-    }
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
 
-    .card {
-      background: white;
-      border-radius: 20px;
-      padding: 25px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      text-align: center;
-    }
+button {
+  width: 100%;
+  padding: 15px;
+  margin: 8px 0;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    .thai {
-      font-size: 48px;
-      margin: 20px 0;
-    }
+.choice { background: #e5e7eb; }
+.choice:hover { background: #d1d5db; }
 
-    .question {
-      font-size: 22px;
-      font-weight: bold;
-    }
+.correct { background: #58cc02; color: white; }
+.wrong { background: #ff4b4b; color: white; }
 
-    button {
-      width: 100%;
-      padding: 15px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 14px;
-      background: #e5e7eb;
-      font-size: 18px;
-      cursor: pointer;
-    }
+.next { background: #1cb0f6; color: white; }
+.blockBtn { background: #6366f1; color: white; }
 
-    button:hover {
-      background: #d1d5db;
-    }
-
-    .correct {
-      background: #58cc02 !important;
-      color: white;
-    }
-
-    .wrong {
-      background: #ff4b4b !important;
-      color: white;
-    }
-
-    .next {
-      background: #1cb0f6;
-      color: white;
-      font-weight: bold;
-    }
-
-    .score {
-      margin-bottom: 15px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .feedback {
-      font-size: 20px;
-      font-weight: bold;
-      margin-top: 15px;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 30px;
-      color: #6b7280;
-      font-size: 14px;
-    }
-  </style>
+</style>
 </head>
 
 <body>
-  <header>ThaiLearn 🇹🇭</header>
 
-  <div class="container">
-    <div class="score">
-      Poäng: <span id="score">0</span> ⭐ |
-      Fråga: <span id="current">1</span>/<span id="total"></span>
-    </div>
+<header>Thai Trainer 🇹🇭 (Latin)</header>
 
-    <div class="card">
-      <div class="question" id="question"></div>
-      <div class="thai" id="thaiWord"></div>
-      <div id="answers"></div>
-      <div class="feedback" id="feedback"></div>
-      <button class="next" onclick="nextQuestion()">Nästa</button>
-    </div>
+<div class="container">
 
-    <footer>
-      Träna thailändska varje dag — små steg ger stora resultat.
-    </footer>
-  </div>
+<div id="menu" class="card">
+  <h2>Välj block</h2>
+  <button class="blockBtn" onclick="startBlock(0)">Block 1</button>
+  <button class="blockBtn" onclick="startBlock(1)">Block 2</button>
+  <button class="blockBtn" onclick="startBlock(2)">Block 3</button>
+  <button class="blockBtn" onclick="startBlock(3)">Block 4</button>
+  <button class="blockBtn" onclick="startBlock(4)">Block 5</button>
+</div>
 
-  <script>
-    const questions = [
-      {
-        thai: "สวัสดี",
-        question: "Vad betyder detta?",
-        answers: ["Hej", "Tack", "Vatten", "Mat"],
-        correct: "Hej"
-      },
-      {
-        thai: "ขอบคุณ",
-        question: "Vad betyder detta?",
-        answers: ["Förlåt", "Tack", "Ja", "Nej"],
-        correct: "Tack"
-      },
-      {
-        thai: "น้ำ",
-        question: "Vad betyder detta?",
-        answers: ["Ris", "Vatten", "Kaffe", "Mjölk"],
-        correct: "Vatten"
-      },
-      {
-        thai: "อาหาร",
-        question: "Vad betyder detta?",
-        answers: ["Mat", "Hus", "Bil", "Skola"],
-        correct: "Mat"
-      },
-      {
-        thai: "ใช่",
-        question: "Vad betyder detta?",
-        answers: ["Nej", "Ja", "Kanske", "Hej"],
-        correct: "Ja"
-      },
-      {
-        thai: "ไม่",
-        question: "Vad betyder detta?",
-        answers: ["Ja", "Nej/inte", "Tack", "Bra"],
-        correct: "Nej/inte"
-      },
-      {
-        thai: "รัก",
-        question: "Vad betyder detta?",
-        answers: ["Äta", "Sova", "Älska", "Springa"],
-        correct: "Älska"
-      },
-      {
-        thai: "บ้าน",
-        question: "Vad betyder detta?",
-        answers: ["Hus", "Hund", "Katt", "Väg"],
-        correct: "Hus"
-      }
-    ];
+<div id="quiz" class="card" style="display:none;">
+  <h3 id="progress"></h3>
+  <h2 id="thai"></h2>
+  <div id="answers"></div>
+  <p id="feedback"></p>
+  <button class="next" onclick="next()">Nästa</button>
+</div>
 
-    let currentIndex = 0;
-    let score = 0;
-    let answered = false;
+</div>
 
-    document.getElementById("total").textContent = questions.length;
+<script>
 
-    function loadQuestion() {
-      answered = false;
-      const q = questions[currentIndex];
+const allData = [
+["phom kamlang rian phasa thai","Jag håller på att lära mig thailändska"],
+["khun tham ngan arai","Vad jobbar du med?"],
+["phom khit wa man yak","Jag tycker det är svårt"],
+["khun phuut chaa dai mai","Kan du prata långsamt?"],
+["phom mai khao jai","Jag förstår inte"],
+["khun chuay phom dai mai","Kan du hjälpa mig?"],
+["phom yaak geng khuen","Jag vill bli bättre"],
+["phom fuk thuk wan","Jag tränar varje dag"],
+["man samkhan mak","Det är väldigt viktigt"],
+["phom tongkaan wela","Jag behöver tid"],
 
-      document.getElementById("question").textContent = q.question;
-      document.getElementById("thaiWord").textContent = q.thai;
-      document.getElementById("current").textContent = currentIndex + 1;
-      document.getElementById("feedback").textContent = "";
+["phom phayayam mak","Jag försöker mycket"],
+["khun khao jai mai","Förstår du?"],
+["phom nueai tae suu","Jag är trött men kämpar"],
+["yaa yom phae","Ge inte upp"],
+["khun geng mak","Du är väldigt bra"],
+["phom phuumjai nai tua eng","Jag är stolt över mig själv"],
+["man khumkha","Det är värt det"],
+["phom ja mai yut","Jag kommer inte sluta"],
+["khun tham dai","Du klarar det"],
+["phom chuea nai tua eng","Jag tror på mig själv"],
 
-      const answersDiv = document.getElementById("answers");
-      answersDiv.innerHTML = "";
+["phom kamlang phatthana","Jag utvecklas"],
+["thuk yang tong chai wela","Allt tar tid"],
+["phom di khuen thuk wan","Jag blir bättre varje dag"],
+["yaa klua phit","Var inte rädd för fel"],
+["kaan fuk tham hai geng","Övning ger färdighet"],
+["phom sanuk kap man","Jag har kul med det"],
+["man mai ngai","Det är inte lätt"],
+["tae phom mai yom phae","Men jag ger inte upp"],
+["phom yaak phuut khlong","Jag vill prata flytande"],
+["phom tangjai jing","Jag menar allvar"],
 
-      q.answers.forEach(answer => {
-        const btn = document.createElement("button");
-        btn.textContent = answer;
-        btn.onclick = () => checkAnswer(btn, answer);
-        answersDiv.appendChild(btn);
-      });
-    }
+["khun khao jai phom mai","Förstår du mig?"],
+["phom yaak long ik khrang","Jag vill försöka igen"],
+["phom rian ru reo khuen","Jag lär mig snabbare"],
+["khun chuay athibai dai mai","Kan du förklara?"],
+["phom kamlang fang","Jag lyssnar"],
+["phom kamlang khit","Jag tänker"],
+["phom yaak geng phasa","Jag vill bli bra på språk"],
+["phom chai man thuk wan","Jag använder det varje dag"],
+["man roem ngai khuen","Det börjar bli lättare"],
+["phom di jai mak","Jag är väldigt glad"],
 
-    function checkAnswer(button, answer) {
-      if (answered) return;
-      answered = true;
+["khun phuut chat mak","Du pratar tydligt"],
+["phom khao jai mak khuen","Jag förstår mer"],
+["man chuay phom mak","Det hjälper mig mycket"],
+["phom ja fuk to","Jag fortsätter träna"],
+["phom mai yut phatthana","Jag slutar inte utvecklas"],
+["man roem sanuk","Det börjar bli roligt"],
+["phom rak phasa thai","Jag älskar thailändska"],
+["phom yaak pai thai","Jag vill åka till Thailand"],
+["phom ja pai hai dai","Jag ska dit"],
+["phom phrom laeo","Jag är redo"]
+];
 
-      const correctAnswer = questions[currentIndex].correct;
-      const feedback = document.getElementById("feedback");
+let blockData = [];
+let current = 0;
+let score = 0;
+let answered = false;
 
-      if (answer === correctAnswer) {
-        button.classList.add("correct");
-        score++;
-        document.getElementById("score").textContent = score;
-        feedback.textContent = "Rätt! 🎉";
-        feedback.style.color = "#58cc02";
-      } else {
-        button.classList.add("wrong");
-        feedback.textContent = "Fel. Rätt svar är: " + correctAnswer;
-        feedback.style.color = "#ff4b4b";
-      }
-    }
+function startBlock(block) {
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("quiz").style.display = "block";
 
-    function nextQuestion() {
-      currentIndex++;
+  blockData = allData.slice(block*20, block*20+20);
+  current = 0;
+  score = 0;
+  load();
+}
 
-      if (currentIndex >= questions.length) {
-        document.querySelector(".card").innerHTML = `
-          <h2>Klar! 🎉</h2>
-          <p>Du fick ${score} av ${questions.length} rätt.</p>
-          <button class="next" onclick="restart()">Börja om</button>
-        `;
-      } else {
-        loadQuestion();
-      }
-    }
+function load() {
+  answered = false;
 
-    function restart() {
-      currentIndex = 0;
-      score = 0;
-      document.location.reload();
-    }
+  document.getElementById("progress").textContent =
+    "Fråga " + (current+1) + " / " + blockData.length;
 
-    loadQuestion();
-  </script>
+  document.getElementById("thai").textContent =
+    blockData[current][0];
+
+  const answersDiv = document.getElementById("answers");
+  answersDiv.innerHTML = "";
+
+  let correct = blockData[current][1];
+
+  let options = [correct];
+
+  while(options.length < 4) {
+    let rand = allData[Math.floor(Math.random()*allData.length)][1];
+    if(!options.includes(rand)) options.push(rand);
+  }
+
+  options.sort(() => Math.random() - 0.5);
+
+  options.forEach(opt => {
+    let btn = document.createElement("button");
+    btn.className = "choice";
+    btn.textContent = opt;
+    btn.onclick = () => check(btn, opt, correct);
+    answersDiv.appendChild(btn);
+  });
+
+  document.getElementById("feedback").textContent = "";
+}
+
+function check(btn, answer, correct) {
+  if(answered) return;
+  answered = true;
+
+  if(answer === correct) {
+    btn.classList.add("correct");
+    document.getElementById("feedback").textContent = "Rätt!";
+    score++;
+  } else {
+    btn.classList.add("wrong");
+    document.getElementById("feedback").textContent =
+      "Fel: " + correct;
+  }
+}
+
+function next() {
+  current++;
+  if(current >= blockData.length) {
+    document.getElementById("quiz").innerHTML =
+      "<h2>Klar!</h2><p>Poäng: "+score+"/20</p><button onclick='location.reload()'>Starta om</button>";
+  } else {
+    load();
+  }
+}
+
+</script>
+
 </body>
 </html>
